@@ -1,93 +1,99 @@
-# 给 Windows Codex 的完整验收任务
+# 给 Windows Codex 的 0.4.0 / 0.5.0 增量验收任务
 
-你现在负责继续 Windows x64 FuinnoAgent HIL。CAD 0.7.0 外形链、缓存和 Giant v2 原生运行时已经 PASS。本轮只验证产品定义 0.3.2 的 RapidOCR session、PDF 提取，以及 Giant 0.4.2 对当前产品定义 PASS 包的适配。不要重跑耗时的 CAD 几何，不要修改算法、重打包或扩大测试集。
+你负责在真实 Windows x64 FuinnoAgent 上验收工程图纸与产品定义 0.4.0 和 Giant 管件工艺与模具 0.5.0。CAD 0.7.0 外形链及缓存已经 PASS，本轮禁止重跑 CAD 几何、修改插件、重打包或增加测试样件。
 
-## 严格边界
+## 1. 严格边界
 
-- Release 中的 `authorized-test-fixtures-step-pdf-2026-08-26.zip` 已经明确获准公开。只使用其中的 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf`；不要运行包内其他样件。
-- 除上述已授权原始测试 ZIP 外，不得把解压文件、绝对路径、运行日志或任何派生结果再次提交到这个公开 GitHub 仓库。
-- 不修改三个插件 ZIP，不替换包内文件，不修改算法或 QA 阈值。
-- 复用首轮 CAD 0.7.0 的 PASS 结果 ZIP；不要再次运行 `analyze` 或缓存复验。失败后最多做一次诊断性重试，不增加样件。
-- 不把结构 QA 的 PASS 说成量产批准。工艺、模具、RFM 结果均保持 `DRAFT_REVIEW`。
+- 只使用 Release 中获准公开的 `authorized-test-fixtures-step-pdf-2026-08-26.zip`，且只运行 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf`。
+- 不得把解压文件、绝对路径、日志、客户资料或派生结果提交到公开仓库。
+- 所有结果保持 `DRAFT_REVIEW`，不得称为量产批准。
+- 失败后最多做一次诊断性重试；不增加样件，不放宽 QA。
+- 源 STEP/PDF 不得修改；前后只报告大小、SHA-256、mtime 是否保持不变，不公开实际哈希。
 
-## 1. 机器与包检查
+## 2. 安装与哈希
 
-1. 记录 Windows 版本、x64、CPU 型号/核心数、内存、可用磁盘、是否有 GPU、FuinnoAgent 版本和当前电源模式。不要记录用户名或机器序列号。
-2. 从本仓库的 `windows-hil-2026-08-27` Release 下载三个插件 ZIP、`authorized-test-fixtures-step-pdf-2026-08-26.zip` 和 `SHA256SUMS.txt`。
-3. 用 PowerShell `Get-FileHash -Algorithm SHA256` 逐个核对；任一不一致立即停止并报告。
-4. 把测试夹具解压到本机新建的私有测试目录，确认默认配对文件 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf` 均存在；不要把解压目录加入 Git。
-5. 保留 CAD 管件形线与壁厚 `0.7.0`。移除产品定义 `0.3.1` 与 Giant `0.4.1`，然后直接安装以下插件 ZIP，不要解压：
-   - 工程图纸与产品定义 `0.3.2`
-   - Giant 管件工艺与模具 `0.4.2`
-6. 安装完成后完整退出并重新启动 HanaAgent/FuinnoAgent一次，清除旧插件的热加载模块缓存，再检查新版本与工具。
-7. 记录安装成功与工具是否可发现。安装界面若必须由用户点击，可以请求一次协助，但不要绕过权限。
+从 `windows-hil-2026-08-28` Release 下载三个插件、测试夹具和 `SHA256SUMS.txt`，逐个用 PowerShell `Get-FileHash -Algorithm SHA256` 核对。任一不一致立即停止。
 
-## 2. 私有运行环境预热
+保留 CAD 0.7.0；卸载产品定义 0.3.2 和 Giant 0.4.2；安装产品定义 0.4.0 和 Giant 0.5.0。ZIP 直接安装，不要解压或替换包内文件。完成后完整退出并重启 FuinnoAgent。
 
-先对产品定义 0.3.2 调用 `runtime_info({"bootstrap":true})`。必须直接返回 `probe_status=PASS`、`ocr_session_initialized=true`、ONNX Runtime 1.23.2 和 RapidOCR installed；不得再用私有脚本补查。Giant 0.4.2 只做一次热态 `runtime_info({"bootstrap":false})`，确认继续使用 `win-amd64-cp312-giant-v2` 且无 NTSTATUS 崩溃。
+期望哈希：
 
-首次环境安装时间与后续任务计算时间必须分开统计。若安装失败，保留错误码和最后 20 行相关日志，不要手工安装系统 Python。
+```text
+66f517c2aa3f37de555b9defb78893da712eb963c01d4f86cbd64c52b6e46318  cad-tube-centerline-thickness-fuinno-windows-x64-0.7.0.zip
+cfb0c24034456460ccfab3edc73c36f4937a9b511983b739cc274f0bd5300bf7  engineering-product-definition-fuinno-windows-x64-0.4.0.zip
+ce1deb4261152f67c283194cc649c2e88d0f24a6d2bba95473673e645af17fcb  giant-tube-engineering-fuinno-windows-x64-0.5.0.zip
+ce4101901218ffe6ecbfc26da072de24d952f6c4a3c254fd8e38634f7f5d657f  authorized-test-fixtures-step-pdf-2026-08-26.zip
+```
 
-## 3. 一个样件的完整链路
+记录匿名 Windows、CPU、内存、可用磁盘、GPU、电源模式、FuinnoAgent 版本、安装耗时和工具是否可发现。不要记录用户名或序列号。
 
-### A. PDF/产品定义插件
+## 3. 运行环境
 
-对 `H0A2Z3-DT.pdf` 依次执行：
+1. 产品定义调用一次 `runtime_info({"bootstrap":true})`，要求 `ready=true`、`probe_status=PASS`、`ocr_session_initialized=true`。
+2. Giant 调用一次 `runtime_info({"bootstrap":true})`，要求 `ready=true`、runtime 为 `win-amd64-cp312-giant-v2`，且无 `0xC0000374`、`0xC0000005`。
+3. 分开记录首次安装与热态耗时；不要手工安装系统 Python。
 
-1. `inspect_sources`
-2. `extract_evidence`
-   - 必须在标注图和结构化候选中找到圆圈竖排壁厚 `1.4、1.1、1.6、1.7、1.3、1.4、1.9 mm`；整数序号、外径 `Ø56` 不得误判为壁厚。
-   - 若图纸含 `名义值 +上偏差/-下偏差 WALL`，必须输出一条完整 `wall_thickness` 候选，不得拆成三个普通长度；`WALL THICKNESS NOT CONTROLLED IN THIS REGION` 一类说明必须作为文字要求保留，不得猜测该区域壁厚。
-3. `propose_definition`
-4. 把 T1–T4、TL1–TL4、TLM1–TLM3、斜面宽长及冲突逐项展示给工程师。
-5. 只有工程师明确接受、修正或驳回后，才执行 `confirm_definition`；不得由模型自己批准。
+## 4. H0 图纸语义链
 
-记录每步耗时、候选数量、需要人工确认的字段、最终 acceptance 状态和产品定义结果包。若资料本身没有某字段，应失败关闭或标为待确认，不得猜数。
+H0 是旧工艺图/历史 oracle，不是新项目的最终产品要求。对 `H0A2Z3-DT.pdf` 依次运行：
 
-### B. CAD 外形插件（复用，不重算）
+1. `inspect_sources`：设置 `usage_mode=historical_replay`，文档角色包含 `HISTORICAL_ORACLE`。
+2. `extract_evidence`：检查 `1.4、1.1、1.6` 被关联到抽管/材料工序平台；`1.7、1.3、1.4、1.9` 被识别为后续工序检查点，而不是全部混成最终成品壁厚。
+3. `propose_definition`：报告每个尺寸的 stage、entity_type、authority、证据位置和冲突。
+4. 只有人工逐项接受、修正或驳回后，调用一次 `confirm_definition`。不得由模型自行确认。
+5. 允许 1–4 个平台壁厚和 0–3 个过渡段；不存在的 TLM 保持 `NOT_APPLICABLE`，不得填零或编造正长度。
+6. 若存在由总长减去已知分段得到的派生长度，必须保留公式、输入证据和残差，并由 validator 独立复算。
 
-直接复用首轮已 PASS 的 CAD 0.7.0 `outer-shape` 结果 ZIP。确认 ZIP 仍存在、acceptance 为 PASS，并核对它绑定同一个 `H0A2Z3-DT.stp`；不要再次执行 `analyze` 或 `inspect`。
+确认包应为 `historical_replay`。用它调用一次 Giant `plan_process`，期望失败关闭为 `HISTORICAL_ORACLE_NOT_PLANNING_INPUT` 或等价明确错误；如果它被当成新规划输入并 PASS，判为严重问题并停止。
 
-沿用首轮记录：
+## 5. 可选过渡段兼容回归
 
-- 环境、STEP 导入、端面识别、扫描、锚点复用、中心线、81 个最终截面、独立 QA、打包和文件登记都有阶段日志；
-- `acceptance.json` 为 PASS，结果包含 `shape-line.csv`、`axial-geometry.csv`、manifest 和结果 ZIP；
-- 41 个中心线锚点来自精确扫描复用，最终 81 站和独立关键站重切仍保留；
-- STEP 的大小、SHA-256 和 mtime 在运行前后不变；
-- 分阶段耗时、总耗时、峰值内存（能安全取得时）和 CPU 利用率。
+在这台 Windows 机器上定位上一轮 0.3.2 已经人工确认的产品定义 PASS ZIP，期望 SHA-256 为：
 
-首轮 `cache_reused=true` 与独立 validator 重跑证据继续有效，本轮不要重复验证。
+```text
+f8a71813435b04909f0dcc133b0eb2282d17931541536db9ef347c5c8ece1253
+```
 
-### C. Giant 工艺规划
+该包只用于旧合同兼容回归，不代表新的产品定义方法。复用既有 CAD 0.7.0 PASS ZIP 和同一原始 STEP/PDF，调用一次 Giant 0.5.0 `plan_process`：
 
-输入同一原始 STEP、B 步 PASS 结果 ZIP、A 步经人工确认的产品定义 PASS 包和原 PDF，执行一次 `plan_process`。确认 source lineage 绑定、T/TL/TLM 映射、工程壁厚折线、扩口/Taper 反向预留、总参数表、固定 seed、候选方案和 acceptance。提案如果仍为 `NEEDS_ENGINEER_CONFIRMATION`，按合同停住，不得强行进入模具。
+- T1–T4 与 TL1–TL4 必须全部保留。
+- TLM1=80 mm；TLM2/TLM3 必须保持 `NOT_APPLICABLE`。
+- 不得再出现 `wall transitions must be exactly one between every adjacent platform`。
+- 缺少过渡段表示相邻平台之间允许立即厚度台阶；不得将其伪造为 0 mm 过渡实体，也不得截断 T2/T3/T4。
+- 检查 source lineage、总参数表、工程壁厚折线、扩口/Taper 预留、固定 seed、候选方案和独立 acceptance。
 
-### D. 模具设计
+如果旧 PASS ZIP 已被删除或哈希不符，不要重做 0.3.2 提取；报告 `NEEDS_INPUT` 并停止这一分支。
 
-在工艺规划 PASS 后，分别运行一次 Normal、TP、Taper 的 preview 模式。每类使用插件/资料中明确存在的机台或设计 profile；缺少机台参数时报告 `NEEDS_INPUT`，不得编造。检查 DXF/Excel/JSON 和适用的 STEP/STL 是否可打开、图号是否仍为预览占位、acceptance 是否通过。
+## 6. 下游冒烟
 
-### E. RFM 工装
+只有兼容回归的 `plan_process` PASS 后，才对其结果各运行一次：
 
-在参数齐全且合同允许时，对同一个工艺规划 PASS 包各运行一次 `belling`、`bending`、`flattening`、`shaping`。检查输出 STEP/STL 可读性、应闭合网格的 watertight、整形外皮的开口边界/法向、source lineage 和 acceptance。缺少明确工艺参数时失败关闭，不得猜测。
+- Normal preview
+- TP preview
+- Taper preview
+- RFM `belling`、`bending`、`flattening`、`shaping`
 
-## 4. 卡顿与超时判定
+每类使用已有明确 profile。缺少机台、图号或工艺参数时返回 `NEEDS_INPUT`，不得猜数。检查 JSON/XLSX/DXF/STEP/STL 可读性、source lineage、acceptance；需要闭合的 STL 检查 watertight，整形外皮保留开口边界和正确法向。
 
-- 任何阶段持续运行但进度仍更新、CPU 仍在工作时，不要误报死循环。
-- 连续 10 分钟没有新阶段/站位日志，并且 CPU 连续约 5 分钟接近空闲时，记录为“疑似卡死”，保存当时阶段、已用时和最后 20 行日志，再安全停止该次调用。
-- 单个几何任务超过 30 分钟但仍有进度时，让当前阶段完成一次并标记 `PERFORMANCE_NEEDS_ATTENTION`；不要启动第二份样件或无限重试。
+## 7. 性能与最终回传
 
-## 5. 最终回复格式
+- 进度持续更新且 CPU 工作时不要误报卡死。
+- 连续 10 分钟无阶段日志且 CPU 约 5 分钟接近空闲，记录疑似卡死并安全停止。
+- 单阶段超过 30 分钟但仍有进度，完成当前阶段后标记 `PERFORMANCE_NEEDS_ATTENTION`，不要启动第二样件。
 
-完成后直接在当前 Codex 对话回复以下 handback，不要自动上传公开仓库：
+最终在当前对话回传：
 
 1. `Outcome`: `ACCEPTED` / `NEEDS_ATTENTION` / `BLOCKED`
-2. 匿名硬件与 Windows/FuinnoAgent 版本
-3. 三个 ZIP 的文件名、SHA-256、安装状态和可发现工具
-4. 三个 runtime 的冷启动/热启动耗时及依赖加载结果
-5. PDF产品定义、首次 outer-shape、缓存 outer-shape、工艺规划、Normal/TP/Taper、四类 RFM：逐项状态、耗时、acceptance、主要输出
-6. `cache_reused` 证据、独立 validator 重跑证据、阶段进度是否可见
-7. 源 STEP/PDF 是否保持大小、哈希、mtime 不变（只写 true/false，不在公开内容中暴露实际哈希）
-8. 性能问题：最慢阶段、CPU/内存观察、是否超过 30 分钟
-9. 所有错误的工具名、阶段、错误码、可复现步骤和最后 20 行相关日志
-10. `Files/external objects changed`：只列插件安装、本机私有结果目录；确认公开仓库未写入客户数据
-11. `Exact next action`：只给最小下一步，不主动修改插件
+2. 匿名硬件、Windows/FuinnoAgent 版本
+3. 三个插件 ZIP 的文件名、SHA-256、安装状态和工具列表
+4. 两个新 runtime 的冷/热耗时与 probe
+5. H0 的 stage/entity/authority 结果、壁厚候选、确认 acceptance
+6. historical 包进入 Giant 时是否正确失败关闭
+7. 旧 v1 PASS 包兼容回归的 plan_process 状态、T/TL/TLM、acceptance 和耗时
+8. Normal/TP/Taper 与四类 RFM 的状态、耗时和主要输出
+9. 源文件是否保持大小、哈希、mtime 不变
+10. 错误工具、阶段、错误码、复现步骤和最后 20 行日志
+11. `Files/external objects changed`
+12. `Exact next action`
+
+不要自动提交公开仓库，也不要修改插件。
