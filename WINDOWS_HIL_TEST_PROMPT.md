@@ -1,6 +1,6 @@
 # 给 Windows Codex 的完整验收任务
 
-你现在负责继续首轮 Windows x64 FuinnoAgent HIL。CAD 0.7.0 外形链和缓存已经 PASS，本轮只验证两个增量修复：产品定义 0.3.1 的 ONNX/Visual C++ 私有运行时，以及 Giant 0.4.1 的按能力延迟加载。不要重跑耗时的 CAD 几何，不要修改算法、重打包或扩大测试集。
+你现在负责继续 Windows x64 FuinnoAgent HIL。CAD 0.7.0 外形链、缓存和 Giant v2 原生运行时已经 PASS。本轮只验证产品定义 0.3.2 的 RapidOCR session、PDF 提取，以及 Giant 0.4.2 对当前产品定义 PASS 包的适配。不要重跑耗时的 CAD 几何，不要修改算法、重打包或扩大测试集。
 
 ## 严格边界
 
@@ -16,14 +16,15 @@
 2. 从本仓库的 `windows-hil-2026-08-27` Release 下载三个插件 ZIP、`authorized-test-fixtures-step-pdf-2026-08-26.zip` 和 `SHA256SUMS.txt`。
 3. 用 PowerShell `Get-FileHash -Algorithm SHA256` 逐个核对；任一不一致立即停止并报告。
 4. 把测试夹具解压到本机新建的私有测试目录，确认默认配对文件 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf` 均存在；不要把解压目录加入 Git。
-5. 保留 CAD 管件形线与壁厚 `0.7.0`。移除产品定义 `0.3.0` 与 Giant `0.4.0`，然后直接安装以下插件 ZIP，不要解压：
-   - 工程图纸与产品定义 `0.3.1`
-   - Giant 管件工艺与模具 `0.4.1`
-6. 记录安装成功与工具是否可发现。安装界面若必须由用户点击，可以请求一次协助，但不要绕过权限。
+5. 保留 CAD 管件形线与壁厚 `0.7.0`。移除产品定义 `0.3.1` 与 Giant `0.4.1`，然后直接安装以下插件 ZIP，不要解压：
+   - 工程图纸与产品定义 `0.3.2`
+   - Giant 管件工艺与模具 `0.4.2`
+6. 安装完成后完整退出并重新启动 HanaAgent/FuinnoAgent一次，清除旧插件的热加载模块缓存，再检查新版本与工具。
+7. 记录安装成功与工具是否可发现。安装界面若必须由用户点击，可以请求一次协助，但不要绕过权限。
 
 ## 2. 私有运行环境预热
 
-按顺序、不要并行，只对产品定义 0.3.1 和 Giant 0.4.1 调用 `runtime_info`。记录冷启动耗时、Python 版本和 runtime_id；产品定义必须显示 `probe_status=PASS`、`ocr_session_initialized=true` 且 `onnxruntime` 可用，不能再出现假 READY；Giant 必须正常返回版本快照，不得出现 `0xC0000374` 或 `0xC0000005`。完成后各调用一次热启动并记录耗时。
+先对产品定义 0.3.2 调用 `runtime_info({"bootstrap":true})`。必须直接返回 `probe_status=PASS`、`ocr_session_initialized=true`、ONNX Runtime 1.23.2 和 RapidOCR installed；不得再用私有脚本补查。Giant 0.4.2 只做一次热态 `runtime_info({"bootstrap":false})`，确认继续使用 `win-amd64-cp312-giant-v2` 且无 NTSTATUS 崩溃。
 
 首次环境安装时间与后续任务计算时间必须分开统计。若安装失败，保留错误码和最后 20 行相关日志，不要手工安装系统 Python。
 
