@@ -4,8 +4,8 @@
 
 ## 严格边界
 
-- 只使用一组用户明确授权、位于本机的同源 STEP 与 PDF。若尚未提供，先向用户索取本机路径；不得下载、猜测或上传客户资料。
-- 不得把 STEP、PDF、客户名称、源 SHA-256、绝对路径、完整日志或派生结果提交到这个公开 GitHub 仓库。
+- Release 中的 `authorized-test-fixtures-step-pdf-2026-08-26.zip` 已经明确获准公开。只使用其中的 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf`；不要运行包内其他样件。
+- 除上述已授权原始测试 ZIP 外，不得把解压文件、绝对路径、运行日志或任何派生结果再次提交到这个公开 GitHub 仓库。
 - 不修改三个插件 ZIP，不替换包内文件，不修改算法或 QA 阈值。
 - 每个模块运行一次；只有完全相同的 `outer-shape` 请求为验证缓存而额外运行一次。失败后最多做一次诊断性重试，不增加样件。
 - 不把结构 QA 的 PASS 说成量产批准。工艺、模具、RFM 结果均保持 `DRAFT_REVIEW`。
@@ -13,13 +13,14 @@
 ## 1. 机器与包检查
 
 1. 记录 Windows 版本、x64、CPU 型号/核心数、内存、可用磁盘、是否有 GPU、FuinnoAgent 版本和当前电源模式。不要记录用户名或机器序列号。
-2. 从本仓库的 `windows-hil-2026-08-27` Release 下载三个 ZIP 和 `SHA256SUMS.txt`。
+2. 从本仓库的 `windows-hil-2026-08-27` Release 下载三个插件 ZIP、`authorized-test-fixtures-step-pdf-2026-08-26.zip` 和 `SHA256SUMS.txt`。
 3. 用 PowerShell `Get-FileHash -Algorithm SHA256` 逐个核对；任一不一致立即停止并报告。
-4. 在 FuinnoAgent 中移除这三个插件的旧版本，然后直接安装 ZIP，不要解压：
+4. 把测试夹具解压到本机新建的私有测试目录，确认默认配对文件 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf` 均存在；不要把解压目录加入 Git。
+5. 在 FuinnoAgent 中移除这三个插件的旧版本，然后直接安装插件 ZIP，不要解压：
    - CAD 管件形线与壁厚 `0.7.0`
    - 工程图纸与产品定义 `0.2.0`
    - Giant 管件工艺与模具 `0.4.0`
-5. 记录安装成功与工具是否可发现。安装界面若必须由用户点击，可以请求一次协助，但不要绕过权限。
+6. 记录安装成功与工具是否可发现。安装界面若必须由用户点击，可以请求一次协助，但不要绕过权限。
 
 ## 2. 私有运行环境预热
 
@@ -31,7 +32,7 @@
 
 ### A. PDF/产品定义插件
 
-对获准 PDF 依次执行：
+对 `H0A2Z3-DT.pdf` 依次执行：
 
 1. `inspect_sources`
 2. `extract_evidence`
@@ -43,7 +44,7 @@
 
 ### B. CAD 外形插件
 
-将同一 STEP 直接执行 `analyze`，模式必须为 `outer-shape`；正常流程不要先跑 `inspect`，也不要使用 STEP 内壁计算捷安特工艺壁厚。
+将 `H0A2Z3-DT.stp` 直接执行 `analyze`，模式必须为 `outer-shape`；正常流程不要先跑 `inspect`，也不要使用 STEP 内壁计算捷安特工艺壁厚。
 
 确认并记录：
 
