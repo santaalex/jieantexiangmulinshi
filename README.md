@@ -7,7 +7,7 @@
 从 [Windows HIL 2026-08-27 预发布](https://github.com/santaalex/jieantexiangmulinshi/releases/tag/windows-hil-2026-08-27) 下载三个插件 ZIP、公开测试夹具和 `SHA256SUMS.txt`：
 
 1. `cad-tube-centerline-thickness-fuinno-windows-x64-0.7.0.zip`
-2. `engineering-product-definition-fuinno-windows-x64-0.2.0.zip`
+2. `engineering-product-definition-fuinno-windows-x64-0.3.0.zip`
 3. `giant-tube-engineering-fuinno-windows-x64-0.4.0.zip`
 4. `authorized-test-fixtures-step-pdf-2026-08-26.zip`
 
