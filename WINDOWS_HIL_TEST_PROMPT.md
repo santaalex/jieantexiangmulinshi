@@ -1,13 +1,13 @@
 # 给 Windows Codex 的完整验收任务
 
-你现在负责在这台真实 Windows x64 电脑上，对三个 FuinnoAgent 插件做一次受控的端到端 HIL 验收。目标是验证“普通用户安装、私有运行环境、一个真实样件全链、重复请求缓存与低配 CPU 性能”，不是修改算法、重打包或扩大测试集。
+你现在负责继续首轮 Windows x64 FuinnoAgent HIL。CAD 0.7.0 外形链和缓存已经 PASS，本轮只验证两个增量修复：产品定义 0.3.1 的 ONNX/Visual C++ 私有运行时，以及 Giant 0.4.1 的按能力延迟加载。不要重跑耗时的 CAD 几何，不要修改算法、重打包或扩大测试集。
 
 ## 严格边界
 
 - Release 中的 `authorized-test-fixtures-step-pdf-2026-08-26.zip` 已经明确获准公开。只使用其中的 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf`；不要运行包内其他样件。
 - 除上述已授权原始测试 ZIP 外，不得把解压文件、绝对路径、运行日志或任何派生结果再次提交到这个公开 GitHub 仓库。
 - 不修改三个插件 ZIP，不替换包内文件，不修改算法或 QA 阈值。
-- 每个模块运行一次；只有完全相同的 `outer-shape` 请求为验证缓存而额外运行一次。失败后最多做一次诊断性重试，不增加样件。
+- 复用首轮 CAD 0.7.0 的 PASS 结果 ZIP；不要再次运行 `analyze` 或缓存复验。失败后最多做一次诊断性重试，不增加样件。
 - 不把结构 QA 的 PASS 说成量产批准。工艺、模具、RFM 结果均保持 `DRAFT_REVIEW`。
 
 ## 1. 机器与包检查
@@ -16,15 +16,14 @@
 2. 从本仓库的 `windows-hil-2026-08-27` Release 下载三个插件 ZIP、`authorized-test-fixtures-step-pdf-2026-08-26.zip` 和 `SHA256SUMS.txt`。
 3. 用 PowerShell `Get-FileHash -Algorithm SHA256` 逐个核对；任一不一致立即停止并报告。
 4. 把测试夹具解压到本机新建的私有测试目录，确认默认配对文件 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf` 均存在；不要把解压目录加入 Git。
-5. 在 FuinnoAgent 中移除这三个插件的旧版本，然后直接安装插件 ZIP，不要解压：
-   - CAD 管件形线与壁厚 `0.7.0`
-   - 工程图纸与产品定义 `0.3.0`
-   - Giant 管件工艺与模具 `0.4.0`
+5. 保留 CAD 管件形线与壁厚 `0.7.0`。移除产品定义 `0.3.0` 与 Giant `0.4.0`，然后直接安装以下插件 ZIP，不要解压：
+   - 工程图纸与产品定义 `0.3.1`
+   - Giant 管件工艺与模具 `0.4.1`
 6. 记录安装成功与工具是否可发现。安装界面若必须由用户点击，可以请求一次协助，但不要绕过权限。
 
 ## 2. 私有运行环境预热
 
-按顺序、不要并行，对三个插件分别调用 `runtime_info(bootstrap=true)`，记录每个插件的冷启动耗时、下载/安装结果、Python 版本、runtime_id，以及 OCP/VTK/VMTK 或 OCR 依赖能否正常加载。完成后再调用一次 `runtime_info(bootstrap=false)`，记录热启动耗时。
+按顺序、不要并行，只对产品定义 0.3.1 和 Giant 0.4.1 调用 `runtime_info`。记录冷启动耗时、Python 版本和 runtime_id；产品定义必须显示 `probe_status=PASS`、`ocr_session_initialized=true` 且 `onnxruntime` 可用，不能再出现假 READY；Giant 必须正常返回版本快照，不得出现 `0xC0000374` 或 `0xC0000005`。完成后各调用一次热启动并记录耗时。
 
 首次环境安装时间与后续任务计算时间必须分开统计。若安装失败，保留错误码和最后 20 行相关日志，不要手工安装系统 Python。
 
@@ -44,11 +43,11 @@
 
 记录每步耗时、候选数量、需要人工确认的字段、最终 acceptance 状态和产品定义结果包。若资料本身没有某字段，应失败关闭或标为待确认，不得猜数。
 
-### B. CAD 外形插件
+### B. CAD 外形插件（复用，不重算）
 
-将 `H0A2Z3-DT.stp` 直接执行 `analyze`，模式必须为 `outer-shape`；正常流程不要先跑 `inspect`，也不要使用 STEP 内壁计算捷安特工艺壁厚。
+直接复用首轮已 PASS 的 CAD 0.7.0 `outer-shape` 结果 ZIP。确认 ZIP 仍存在、acceptance 为 PASS，并核对它绑定同一个 `H0A2Z3-DT.stp`；不要再次执行 `analyze` 或 `inspect`。
 
-确认并记录：
+沿用首轮记录：
 
 - 环境、STEP 导入、端面识别、扫描、锚点复用、中心线、81 个最终截面、独立 QA、打包和文件登记都有阶段日志；
 - `acceptance.json` 为 PASS，结果包含 `shape-line.csv`、`axial-geometry.csv`、manifest 和结果 ZIP；
@@ -56,7 +55,7 @@
 - STEP 的大小、SHA-256 和 mtime 在运行前后不变；
 - 分阶段耗时、总耗时、峰值内存（能安全取得时）和 CPU 利用率。
 
-随后对完全相同的 STEP、profile 和参数再次执行 `outer-shape analyze`：必须报告 `cache_reused=true`，跳过 CAD 几何重算，但重新生成并运行独立 validator；两次 acceptance 均应 PASS。若没有复用，记录原因，不要反复重跑。
+首轮 `cache_reused=true` 与独立 validator 重跑证据继续有效，本轮不要重复验证。
 
 ### C. Giant 工艺规划
 
