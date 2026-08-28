@@ -1,5 +1,7 @@
 # Windows RFM 增量复测
 
+> 状态：`ACCEPTED`。本任务已于 2026-08-28 完成，请勿重复运行；下文仅作为验收过程记录。
+
 本轮只验证 Giant 0.5.4 对既有 0.5.2 plan PASS 包的兼容，以及 RFM 原生库退出修复。不要重跑 CAD、PDF/OCR、产品定义、`plan_process` 或三个模具 preview；不要修改插件、结果包或测试样件。
 
 ## 安装

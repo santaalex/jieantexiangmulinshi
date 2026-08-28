@@ -1,6 +1,6 @@
 # 捷安特管件工程插件｜Windows HIL 验收中转
 
-本仓库只用于在一台真实 Windows x64 电脑上验收三个 FuinnoAgent 插件候选包。插件仍是工程试用候选，所有工艺、模具和工装输出均为 `DRAFT_REVIEW`，不得直接用于量产批准。
+本仓库用于三个 FuinnoAgent 插件的 Windows x64 HIL 中转。Giant 0.5.4 的 RFM 增量验收已于 2026-08-28 `ACCEPTED`；插件仍是工程试用版本，所有工艺、模具和工装输出均为 `DRAFT_REVIEW`，不得直接用于量产批准。
 
 ## 下载
 
@@ -15,6 +15,6 @@
 
 ## 测试
 
-把 [WINDOWS_HIL_TEST_PROMPT.md](WINDOWS_HIL_TEST_PROMPT.md) 全文复制给 Windows 电脑上的 Codex。测试夹具已经明确获准公开；默认只使用其中的 `H0A2Z3-DT.stp` 与 `H0A2Z3-DT.pdf`，不要运行包内其他样件。完整日志和生成结果仍不得上传到本公开仓库。
+Giant 0.5.4 的 [WINDOWS_HIL_TEST_PROMPT.md](WINDOWS_HIL_TEST_PROMPT.md) 已执行完毕并保留为验收记录，无需重复运行。测试夹具已经明确获准公开；完整日志和生成结果仍不得上传到本公开仓库。
 
-本轮只验证 RFM 的跨版本输入和 Windows 退出修复：0.5.4 可在严格 lineage/QA 闸门下消费 contract 2.2.0 的 0.5.2 plan PASS 包，并确保成功或 ContractError 都不会被 OCCT/VTK 退出阶段的 NTSTATUS 崩溃覆盖。直接复用既有 plan PASS 包，只重跑 belling 与 bending；不重跑 CAD、PDF、产品定义、工艺规划或模具 preview。
+验收结果：0.5.4 成功消费 contract 2.2.0 的 0.5.2 plan PASS 包；belling 与 bending 均生成 watertight STEP/STL、独立 QA 9/9 PASS 和结果 ZIP，未再出现版本绑定错误、`0xC0000005` 或 `0xC0000374`。bending 实测约 25 分 51 秒，属于后续可优化的性能项，不影响本次功能验收。
