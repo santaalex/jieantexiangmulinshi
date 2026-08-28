@@ -1,6 +1,6 @@
 # Windows bending 性能与几何增量复测
 
-> 状态：`PENDING`。本轮只运行一次 bending，不扩展测试范围。
+> 状态：`ACCEPTED`。本任务已于 2026-08-28 完成，请勿重复运行；下文仅作为验收过程记录。
 
 Giant 0.5.5 将 bending 从逐三角面 STEP 改为连续截面 NURBS 放样，并增加保守的 0.03 mm 自适应采样与独立 STEP/STL 几何一致性检查。不要重跑 CAD、PDF/OCR、产品定义、`plan_process`、模具、belling、flattening 或 shaping；不要修改插件、结果包或样件。
 
