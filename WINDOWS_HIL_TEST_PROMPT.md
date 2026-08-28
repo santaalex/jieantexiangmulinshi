@@ -1,57 +1,51 @@
-# Windows 技术主链复测
+# Windows RFM 增量复测
 
-本轮只验证 Giant 0.5.2 的长度域修复和后续输出能力。不要重跑 CAD、PDF、OCR、历史语义或产品定义确认；不要修改插件和测试样件。
+本轮只验证 Giant 0.5.3 的 RFM 原生库退出修复。不要重跑 CAD、PDF/OCR、产品定义、`plan_process` 或三个模具 preview；不要修改插件、结果包或测试样件。
 
 ## 安装
 
 1. 保留 CAD 0.7.0 和产品定义 0.4.0。
-2. 卸载 Giant 0.5.1，安装 `giant-tube-engineering-fuinno-windows-x64-0.5.2.zip`。
-3. 核对 SHA-256：`ac5bd028074ec1bd9122f8ea9fca6e6654e26c017b983190795a3907c9ef51c6`。
-4. 完整退出并重启 FuinnoAgent，只调用一次 Giant `runtime_info({"bootstrap":false})`。
+2. 卸载 Giant 0.5.2，安装 `giant-tube-engineering-fuinno-windows-x64-0.5.3.zip`。
+3. 核对 SHA-256：`4ce7a3f48e11aaa2a39333e2f09f3bcc332a89effd3c2f0779fa4d82e9d67679`。
+4. 完整退出并重启 FuinnoAgent，确认 Giant 0.5.3 loaded。只调用一次 `runtime_info({"bootstrap":false})`。
 
 ## 输入
 
-直接复用本机已有文件：
+直接复用本机已有且未修改的文件：
 
-- CAD 0.7.0 PASS ZIP：`6779739152f14f2224f7446c39f13af1193ede6f4352a483dc5bd0b5f5fb3f61`
-- 产品定义 0.3.2 PASS ZIP：`f8a71813435b04909f0dcc133b0eb2282d17931541536db9ef347c5c8ece1253`
-- 原始 H0 STEP/PDF，仅用于 source lineage；不得重算或修改。
+- Giant 0.5.2 `plan_process` PASS ZIP，SHA-256：`12d598a3ca9d85587f7b75085b5a2ff3df63b8816ae26ded6443e30b2dd74cd3`
+- 原始 H0 STEP，仅用于既有 RFM source lineage
+- 0.5.2 失败调用所用的 belling 与 bending 参数原样复用
+
+不得接受 0.5.2 崩溃后留下的 PENDING manifest、STEP/STL 或未验收目录作为 PASS；必须由 0.5.3 分别新建 job。
 
 ## 执行
 
-只调用一次 `plan_process`。期望输入参数为：
+只执行两个调用：
 
-- `T1–T4 = 1.7 / 1.3 / 1.9 / 1.4 mm`
-- `TL1–TL4 = 90 / 280 / 140 / 20 mm`
-- `TLM1 = 80 mm`
-- `TLM2/TLM3 = NOT_APPLICABLE`
+1. `run_rfm`，operation=`belling`
+2. `run_rfm`，operation=`bending`
 
-必须确认：四个平台全部保留；缺失 TLM 不被猜数；不再出现 `wall transitions must be exactly one between every adjacent platform`。
+每个调用只运行一次，不做诊断重试。必须确认：
 
-同时确认 `wall-profile.json` 独立记录：分段链 610 mm、PDF E1 631.6 mm、图纸未分段余量 21.6 mm、CAD/E1 差值约 2.367279 mm、计算延续约 23.967279 mm。原始 TL4 必须仍为 20 mm；计算延续不得伪装成 TL4 或 TLM。
+- engine 正常返回，不再出现 `0xC0000005` 或 `0xC0000374`
+- 生成 STEP/STL
+- 独立 validator 完成且 acceptance=`PASS`
+- 生成结果 ZIP，并回传 SHA-256
+- 输出仍为 `DRAFT_REVIEW`
 
-若 `plan_process` PASS，再各运行一次：
-
-- Normal preview
-- TP preview
-- Taper preview
-- RFM belling
-- RFM bending
-- RFM flattening
-- RFM shaping
-
-缺少明确机台或工艺参数时返回 `NEEDS_INPUT`，不得猜数；其余链路继续。所有输出保持 `DRAFT_REVIEW`。
+`flattening` 和 `shaping` 本轮不运行；它们此前的 `NEEDS_INPUT` 不是本次缺陷。
 
 ## 回传
 
 只回传一份简洁 handback：
 
 1. Outcome
-2. Giant 版本、ZIP SHA、runtime 状态
-3. plan_process 状态、耗时、T/TL/TLM、acceptance、结果 ZIP SHA
-4. 三个模具 preview 与四类 RFM 的状态、耗时和主要输出
-5. 错误码和原文
-6. 源文件是否保持不变
+2. Giant 版本、安装 ZIP SHA、runtime 状态
+3. belling 与 bending 各自的状态、耗时、generated model count、acceptance、结果 ZIP SHA
+4. 是否仍出现原生退出码；如失败，给错误原文和最后相关日志
+5. 输入文件和既有 plan PASS ZIP 是否保持不变
+6. Files/external objects changed
 7. Exact next action
 
 不上传日志或派生结果，不自动修改公开仓库。
