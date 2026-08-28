@@ -1,13 +1,13 @@
 # Windows RFM 增量复测
 
-本轮只验证 Giant 0.5.3 的 RFM 原生库退出修复。不要重跑 CAD、PDF/OCR、产品定义、`plan_process` 或三个模具 preview；不要修改插件、结果包或测试样件。
+本轮只验证 Giant 0.5.4 对既有 0.5.2 plan PASS 包的兼容，以及 RFM 原生库退出修复。不要重跑 CAD、PDF/OCR、产品定义、`plan_process` 或三个模具 preview；不要修改插件、结果包或测试样件。
 
 ## 安装
 
 1. 保留 CAD 0.7.0 和产品定义 0.4.0。
-2. 卸载 Giant 0.5.2，安装 `giant-tube-engineering-fuinno-windows-x64-0.5.3.zip`。
-3. 核对 SHA-256：`4ce7a3f48e11aaa2a39333e2f09f3bcc332a89effd3c2f0779fa4d82e9d67679`。
-4. 完整退出并重启 FuinnoAgent，确认 Giant 0.5.3 loaded。只调用一次 `runtime_info({"bootstrap":false})`。
+2. 卸载 Giant 0.5.3，安装 `giant-tube-engineering-fuinno-windows-x64-0.5.4.zip`。
+3. 核对 SHA-256：`a03a6b57136d1e9d17b73844c320c08f685e34fe8f8c89793f0d7689f4d4b80a`。
+4. 完整退出并重启 FuinnoAgent，确认 Giant 0.5.4 loaded。只调用一次 `runtime_info({"bootstrap":false})`。
 
 ## 输入
 
@@ -17,7 +17,7 @@
 - 原始 H0 STEP，仅用于既有 RFM source lineage
 - 0.5.2 失败调用所用的 belling 与 bending 参数原样复用
 
-不得接受 0.5.2 崩溃后留下的 PENDING manifest、STEP/STL 或未验收目录作为 PASS；必须由 0.5.3 分别新建 job。
+不得接受 0.5.2/0.5.3 崩溃后留下的 PENDING manifest、STEP/STL 或未验收目录作为 PASS；必须由 0.5.4 分别新建 job。
 
 ## 执行
 
@@ -28,6 +28,7 @@
 
 每个调用只运行一次，不做诊断重试。必须确认：
 
+- 不再出现 `process result version, job, or engineering-status binding mismatch`
 - engine 正常返回，不再出现 `0xC0000005` 或 `0xC0000374`
 - 生成 STEP/STL
 - 独立 validator 完成且 acceptance=`PASS`
