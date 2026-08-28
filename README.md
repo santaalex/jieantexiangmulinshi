@@ -1,6 +1,6 @@
 # 捷安特管件工程插件｜Windows HIL 验收中转
 
-本仓库用于三个 FuinnoAgent 插件的 Windows x64 HIL 中转。Giant 0.5.4 的 RFM 增量验收已于 2026-08-28 `ACCEPTED`；插件仍是工程试用版本，所有工艺、模具和工装输出均为 `DRAFT_REVIEW`，不得直接用于量产批准。
+本仓库用于三个 FuinnoAgent 插件的 Windows x64 HIL 中转。Giant 0.5.5 只优化 bending 目标管件包络的生成与 STEP 导出，当前状态为 `WINDOWS_HIL_PENDING`；插件仍是工程试用版本，所有工艺、模具和工装输出均为 `DRAFT_REVIEW`，不得直接用于量产批准。
 
 ## 下载
 
@@ -8,13 +8,13 @@
 
 1. `cad-tube-centerline-thickness-fuinno-windows-x64-0.7.0.zip`
 2. `engineering-product-definition-fuinno-windows-x64-0.4.0.zip`
-3. `giant-tube-engineering-fuinno-windows-x64-0.5.4.zip`
+3. `giant-tube-engineering-fuinno-windows-x64-0.5.5.zip`
 4. `authorized-test-fixtures-step-pdf-2026-08-26.zip`
 
 三个插件 ZIP 不要解压，直接在 FuinnoAgent 插件页安装；测试夹具 ZIP 需要解压到本机测试目录。旧插件版本应先移除，不要同时保留多个版本。
 
 ## 测试
 
-Giant 0.5.4 的 [WINDOWS_HIL_TEST_PROMPT.md](WINDOWS_HIL_TEST_PROMPT.md) 已执行完毕并保留为验收记录，无需重复运行。测试夹具已经明确获准公开；完整日志和生成结果仍不得上传到本公开仓库。
+Giant 0.5.5 的 [WINDOWS_HIL_TEST_PROMPT.md](WINDOWS_HIL_TEST_PROMPT.md) 只要求复用既有 H0 输入增量运行一次 bending。测试夹具已经明确获准公开；完整日志和生成结果仍不得上传到本公开仓库。
 
-验收结果：0.5.4 成功消费 contract 2.2.0 的 0.5.2 plan PASS 包；belling 与 bending 均生成 watertight STEP/STL、独立 QA 9/9 PASS 和结果 ZIP，未再出现版本绑定错误、`0xC0000005` 或 `0xC0000374`。bending 实测约 25 分 51 秒，属于后续可优化的性能项，不影响本次功能验收。
+本地发布验收：0.5.5 保留 152 个轴向候选站，按 0.03 mm 几何容差生成 52 点截面，输出非 ruled NURBS STEP；私有 2052 样件 STEP/STL 均为 watertight，独立 QA 9/9 PASS，包围盒最大差 0.084 mm、体积差 0.28%。Windows 实机耗时和稳定性以本轮 HIL 为准。
