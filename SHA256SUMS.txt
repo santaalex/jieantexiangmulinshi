@@ -1,4 +1,4 @@
 66f517c2aa3f37de555b9defb78893da712eb963c01d4f86cbd64c52b6e46318  cad-tube-centerline-thickness-fuinno-windows-x64-0.7.0.zip
 cfb0c24034456460ccfab3edc73c36f4937a9b511983b739cc274f0bd5300bf7  engineering-product-definition-fuinno-windows-x64-0.4.0.zip
-fc789873e8a7063f0105c3f4a0b2445ecff1588504aee3b61149780d1b0b34ea  giant-tube-engineering-fuinno-windows-x64-0.5.1.zip
+ac5bd028074ec1bd9122f8ea9fca6e6654e26c017b983190795a3907c9ef51c6  giant-tube-engineering-fuinno-windows-x64-0.5.2.zip
 ce4101901218ffe6ecbfc26da072de24d952f6c4a3c254fd8e38634f7f5d657f  authorized-test-fixtures-step-pdf-2026-08-26.zip

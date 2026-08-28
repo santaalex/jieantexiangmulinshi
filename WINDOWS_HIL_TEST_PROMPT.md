@@ -1,12 +1,12 @@
 # Windows 技术主链复测
 
-本轮只验证 Giant 0.5.1 的可选过渡段修复和后续输出能力。不要重跑 CAD、PDF、OCR、历史语义或产品定义确认；不要修改插件和测试样件。
+本轮只验证 Giant 0.5.2 的长度域修复和后续输出能力。不要重跑 CAD、PDF、OCR、历史语义或产品定义确认；不要修改插件和测试样件。
 
 ## 安装
 
 1. 保留 CAD 0.7.0 和产品定义 0.4.0。
-2. 卸载 Giant 0.5.0，安装 `giant-tube-engineering-fuinno-windows-x64-0.5.1.zip`。
-3. 核对 SHA-256：`fc789873e8a7063f0105c3f4a0b2445ecff1588504aee3b61149780d1b0b34ea`。
+2. 卸载 Giant 0.5.1，安装 `giant-tube-engineering-fuinno-windows-x64-0.5.2.zip`。
+3. 核对 SHA-256：`ac5bd028074ec1bd9122f8ea9fca6e6654e26c017b983190795a3907c9ef51c6`。
 4. 完整退出并重启 FuinnoAgent，只调用一次 Giant `runtime_info({"bootstrap":false})`。
 
 ## 输入
@@ -27,6 +27,8 @@
 - `TLM2/TLM3 = NOT_APPLICABLE`
 
 必须确认：四个平台全部保留；缺失 TLM 不被猜数；不再出现 `wall transitions must be exactly one between every adjacent platform`。
+
+同时确认 `wall-profile.json` 独立记录：分段链 610 mm、PDF E1 631.6 mm、图纸未分段余量 21.6 mm、CAD/E1 差值约 2.367279 mm、计算延续约 23.967279 mm。原始 TL4 必须仍为 20 mm；计算延续不得伪装成 TL4 或 TLM。
 
 若 `plan_process` PASS，再各运行一次：
 
